@@ -20,10 +20,7 @@ function App() {
   
     // Front Cover
     if (frontCoverImage) {
-      // Convert frontCoverImage to Blob
-      const frontCoverBlob = new Blob([frontCoverImage], { type: 'image/jpeg' });
-      const frontCoverDataURL = URL.createObjectURL(frontCoverBlob);
-      doc.addImage(frontCoverDataURL, 'JPEG', 10, 10, 180, 120);
+      doc.addImage(frontCoverImage, 'JPEG', 10, 10, 180, 120);
       doc.setFontSize(20);
       doc.text(20, 150, title);
       doc.text(20, 170, `by ${author}`);
@@ -37,8 +34,7 @@ function App() {
       }
   
       if (pageContent.imageUrl) {
-        const imgData = pageContent.imageUrl;
-        doc.addImage(imgData, 'JPEG', 10, 10, 180, 120);
+        doc.addImage(pageContent.imageUrl, 'JPEG', 10, 10, 180, 120);
       }
   
       if (pageContent.text) {
@@ -51,38 +47,52 @@ function App() {
   
     // Back Cover
     if (backCoverImage) {
-      // Convert backCoverImage to Blob
-      const backCoverBlob = new Blob([backCoverImage], { type: 'image/jpeg' });
-      const backCoverDataURL = URL.createObjectURL(backCoverBlob);
-      doc.addImage(backCoverDataURL, 'JPEG', 10, 10, 180, 120);
+      doc.addImage(backCoverImage, 'JPEG', 10, 10, 180, 120);
     }
   
     // Save PDF
     doc.save(`${title}.pdf`);
   };
-  
-  
-  
+
   return (
     <div className="App">
       <h1>BriBooks</h1>
       
       {/* Image Upload */}
       <ImageUpload label="Front Cover Image" onChange={setFrontCoverImage} />
+     
       <ImageUpload label="Back Cover Image" onChange={setBackCoverImage} />
-      
+     
       {/* Text Input */}
       <TextInput label="Title" value={title} onChange={setTitle} />
       <TextInput label="Author" value={author} onChange={setAuthor} />
-      
-      {/* Page Management */}
-      <PageManagement pages={pages} setPages={setPages} />
-      
-      {/* Preview Mode */}
-      <PreviewMode frontCoverImage={frontCoverImage} backCoverImage={backCoverImage} title={title} author={author} pages={pages} />
+
+      <div className="flex-container">
+        {/* Page Management */}
+        <div className="half-width">
+          <PageManagement pages={pages} setPages={setPages} />
+        </div>
+
+        {/* Preview Mode */}
+        <div className="half-width">
+        <PreviewMode 
+  frontCoverImage={frontCoverImage} 
+  backCoverImage={backCoverImage} 
+  title={title} 
+  author={author} 
+  pages={pages} 
+  onRemoveFrontCover={() => setFrontCoverImage(null)} 
+  onRemovePage={(index) => {
+    const newPages = [...pages];
+    newPages.splice(index, 1);
+    setPages(newPages);
+  }} 
+/>
+ </div>
+      </div>
       
       {/* PDF Generation */}
-      <button onClick={handleGeneratePdf}>Generate PDF</button>
+      <button className="generate-pdf-button" onClick={handleGeneratePdf}>Generate PDF</button>
       
       {/* Error Handling */}
       <ErrorHandling error={error} />
@@ -90,4 +100,4 @@ function App() {
   );
 }
 
-export default  App;
+export default App;
