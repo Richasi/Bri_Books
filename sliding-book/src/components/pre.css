@@ -42,3 +42,21 @@
     font-weight: bold;
     color: #555555; /* Adjust label color */
 }
+.remove-button {
+    background-color: #ff0000;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    margin-top: 5px;
+    cursor: pointer;
+  }
+  
+  .cover-container {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .remove-button:hover {
+    background-color: #cc0000;
+  }

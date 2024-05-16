@@ -81,13 +81,13 @@ pages.forEach((pageContent, index) => {
       <h1>BriBooks</h1>
       
       {/* Image Upload */}
-      <ImageUpload label="Front Cover Image" onChange={setFrontCoverImage} />
+      <ImageUpload label="Front Cover Image  " onChange={setFrontCoverImage} />
      
-      <ImageUpload label="Back Cover Image" onChange={setBackCoverImage} />
+      <ImageUpload label="Back Cover Image  " onChange={setBackCoverImage} />
      
       {/* Text Input */}
-      <TextInput label="Title" value={title} onChange={setTitle} />
-      <TextInput label="Author" value={author} onChange={setAuthor} />
+      <TextInput label="Title  " value={title} onChange={setTitle} />
+      <TextInput label="Author  " value={author} onChange={setAuthor} />
 
       <div className="flex-container">
         {/* Page Management */}
@@ -104,6 +104,7 @@ pages.forEach((pageContent, index) => {
   author={author} 
   pages={pages} 
   onRemoveFrontCover={() => setFrontCoverImage(null)} 
+  onRemoveBackCover={() => setBackCoverImage(null)} 
   onRemovePage={(index) => {
     const newPages = [...pages];
     newPages.splice(index, 1);

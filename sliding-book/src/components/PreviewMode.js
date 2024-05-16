@@ -1,7 +1,7 @@
 import React from 'react';
 import "./pre.css"
 
-const PreviewMode = ({ frontCoverImage, backCoverImage, title, author, pages, onRemoveFrontCover, onRemovePage }) => {
+const PreviewMode = ({ frontCoverImage, backCoverImage, title, author, pages, onRemoveFrontCover, onRemoveBackCover, onRemovePage }) => {
   return (
     <div className="preview-page">
       <h2 className="title">{title}</h2>
@@ -9,7 +9,7 @@ const PreviewMode = ({ frontCoverImage, backCoverImage, title, author, pages, on
       {frontCoverImage && (
         <div>
           <img className="preview-cover-image" src={frontCoverImage} alt="Front Cover" />
-          <button onClick={onRemoveFrontCover}>Remove Front Cover</button>
+          <button className="remove-button" onClick={onRemoveFrontCover}>Remove Front Cover</button>
         </div>
       )}
       {pages.map((page, index) => (
@@ -18,13 +18,18 @@ const PreviewMode = ({ frontCoverImage, backCoverImage, title, author, pages, on
           {page.imageUrl && (
             <div>
               <img className="preview-page-image" src={page.imageUrl} alt={`Page ${index + 1}`} />
-              <button onClick={() => onRemovePage(index)}>Remove Page</button>
+              <button className="remove-button" onClick={() => onRemovePage(index)}>Remove Page</button>
             </div>
           )}
           <p className="label">{page.text}</p>
         </div>
       ))}
-      {backCoverImage && <img className="preview-cover-image" src={backCoverImage} alt="Back Cover" />}
+      {backCoverImage && (
+        <div>
+          <img className="preview-cover-image" src={backCoverImage} alt="Back Cover" />
+          <button className="remove-button" onClick={onRemoveBackCover}>Remove Back Cover</button>
+        </div>
+      )}
     </div>
   );
 };
