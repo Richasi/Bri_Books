@@ -18,39 +18,54 @@ function App() {
   const handleGeneratePdf = () => {
     const doc = new jsPDF();
   
-    // Function to add image as background image
+    // Function to add image as background image with CSS styling
     const addBackgroundImage = (imageUrl) => {
       const width = doc.internal.pageSize.getWidth();
       const height = doc.internal.pageSize.getHeight();
+  
+      // Add the image to the PDF with CSS styling
       doc.addImage(imageUrl, 'JPEG', 0, 0, width, height, '', 'FAST');
+  
+      // Get the reference to the added image
+      const imgIndex = doc.internal.getNumberOfPages() - 1;
+  
+      // Set CSS styles to ensure the image fits the page
+      doc.setPage(imgIndex);
+      doc.setDrawColor(255, 255, 255); // Set the color for drawing operations (white)
+      doc.setFillColor(255, 255, 255); // Set the fill color (white)
+      doc.rect(0, 0, width, height, 'F'); // Add a white rectangle to cover the page
+     doc.addImage(imageUrl, 'JPEG', 0, 0, width, height); // Add the image again to cover the white rectangle
     };
   
     // Front Cover
-    if (frontCoverImage) {
-      addBackgroundImage(frontCoverImage);
-      doc.setFontSize(20);
-      doc.text(20, 150, title);
-      doc.text(20, 170, `by ${author}`);
-      doc.addPage();
-    }
-  
-    // Content Pages
-    pages.forEach((pageContent, index) => {
-      if (pageContent.text === '' && !pageContent.imageUrl) {
-        return; // Skip empty pages
-      }
-  
-      if (pageContent.imageUrl) {
-        addBackgroundImage(pageContent.imageUrl);
-      }
-  
-      if (pageContent.text) {
-        doc.setFontSize(12);
-        doc.text(20, 20, pageContent.text);
-      }
-  
-      doc.addPage(); // Move to next page
-    });
+   // Front Cover
+if (frontCoverImage) {
+  addBackgroundImage(frontCoverImage);
+  doc.setFontSize(40);
+  doc.text(20, 150, title);
+  doc.setFontSize(20); // Set font size for author name
+  const authorTextWidth = doc.getStringUnitWidth(author) * 20; // Calculate width of author name
+  doc.text(20 + 180 - authorTextWidth, 250, `by ${author}`); // Position author name at bottom right
+  doc.addPage();
+}
+
+// Content Pages
+pages.forEach((pageContent, index) => {
+  if (pageContent.text === '' && !pageContent.imageUrl) {
+    return; // Skip empty pages
+  }
+
+  if (pageContent.imageUrl) {
+    addBackgroundImage(pageContent.imageUrl);
+  }
+
+  if (pageContent.text) {
+    doc.setFontSize(20);
+    doc.text(40, 40, pageContent.text);
+  }
+
+  doc.addPage(); // Move to next page
+});
   
     // Back Cover
     if (backCoverImage) {
@@ -60,6 +75,7 @@ function App() {
     // Save PDF
     doc.save(`${title}.pdf`);
   };
+  
   return (
     <div className="App">
       <h1>BriBooks</h1>
