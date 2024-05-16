@@ -44,26 +44,7 @@ const PageManagement = ({ pages, setPages }) => {
     setImageFiles(newImageFiles);
   };
 
-  const generatePdf = () => {
-    const pdf = new jsPDF();
-    const pagePromises = pages.map((page, index) => {
-      return new Promise((resolve) => {
-        const pageContent = document.getElementById(`page-${index}`);
-        html2canvas(pageContent).then((canvas) => {
-          const imgData = canvas.toDataURL('image/png');
-          pdf.addImage(imgData, 'PNG', 10, 10, 180, 150);
-          if (index !== pages.length - 1) {
-            pdf.addPage();
-          }
-          resolve();
-        });
-      });
-    });
-
-    Promise.all(pagePromises).then(() => {
-      pdf.save('pages.pdf');
-    });
-  };
+ 
 
   return (
     <div id="page-management" className="page-management-container">

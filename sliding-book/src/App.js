@@ -18,9 +18,16 @@ function App() {
   const handleGeneratePdf = () => {
     const doc = new jsPDF();
   
+    // Function to add image as background image
+    const addBackgroundImage = (imageUrl) => {
+      const width = doc.internal.pageSize.getWidth();
+      const height = doc.internal.pageSize.getHeight();
+      doc.addImage(imageUrl, 'JPEG', 0, 0, width, height, '', 'FAST');
+    };
+  
     // Front Cover
     if (frontCoverImage) {
-      doc.addImage(frontCoverImage, 'JPEG', 10, 10, 180, 120);
+      addBackgroundImage(frontCoverImage);
       doc.setFontSize(20);
       doc.text(20, 150, title);
       doc.text(20, 170, `by ${author}`);
@@ -34,7 +41,7 @@ function App() {
       }
   
       if (pageContent.imageUrl) {
-        doc.addImage(pageContent.imageUrl, 'JPEG', 10, 10, 180, 120);
+        addBackgroundImage(pageContent.imageUrl);
       }
   
       if (pageContent.text) {
@@ -47,13 +54,12 @@ function App() {
   
     // Back Cover
     if (backCoverImage) {
-      doc.addImage(backCoverImage, 'JPEG', 10, 10, 180, 120);
+      addBackgroundImage(backCoverImage);
     }
   
     // Save PDF
     doc.save(`${title}.pdf`);
   };
-
   return (
     <div className="App">
       <h1>BriBooks</h1>
