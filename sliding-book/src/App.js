@@ -15,109 +15,115 @@ function App() {
   const [pages, setPages] = useState([]);
   const [error, setError] = useState('');
 
-  const handleGeneratePdf = () => {
+  const loadImage = (imageUrl) => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.src = imageUrl;
+      img.onload = () => resolve(img);
+      img.onerror = (err) => reject(err);
+    });
+  };
+
+  const handleGeneratePdf = async () => {
     const doc = new jsPDF();
-  
-    // Function to add image as background image with CSS styling
-    const addBackgroundImage = (imageUrl) => {
-      const width = doc.internal.pageSize.getWidth();
-      const height = doc.internal.pageSize.getHeight();
-  
-      // Add the image to the PDF with CSS styling
-      doc.addImage(imageUrl, 'JPEG', 0, 0, width, height, '', 'FAST');
-  
-      // Get the reference to the added image
-      const imgIndex = doc.internal.getNumberOfPages() - 1;
-  
-      // Set CSS styles to ensure the image fits the page
-      doc.setPage(imgIndex);
-      doc.setDrawColor(255, 255, 255); // Set the color for drawing operations (white)
-      doc.setFillColor(255, 255, 255); // Set the fill color (white)
-      doc.rect(0, 0, width, height, 'F'); // Add a white rectangle to cover the page
-     doc.addImage(imageUrl, 'JPEG', 0, 0, width, height); // Add the image again to cover the white rectangle
+
+    const addBackgroundImage = async (imageUrl) => {
+      try {
+        const img = await loadImage(imageUrl);
+        const width = doc.internal.pageSize.getWidth();
+        const height = doc.internal.pageSize.getHeight();
+        const imgWidth = img.width;
+        const imgHeight = img.height;
+        const aspectRatio = imgWidth / imgHeight;
+
+        let newWidth = width;
+        let newHeight = height;
+
+        if (width / height > aspectRatio) {
+          newWidth = height * aspectRatio;
+        } else {
+          newHeight = width / aspectRatio;
+        }
+
+        const xOffset = (width - newWidth) / 2;
+        const yOffset = (height - newHeight) / 2;
+
+        doc.addImage(imageUrl, 'JPEG', xOffset, yOffset, newWidth, newHeight);
+      } catch (err) {
+        console.error('Error loading image', err);
+        setError('Error loading image');
+      }
     };
-  
+
     // Front Cover
-   // Front Cover
-if (frontCoverImage) {
-  addBackgroundImage(frontCoverImage);
-  doc.setFontSize(40);
-  doc.text(20, 150, title);
-  doc.setFontSize(20); // Set font size for author name
-  const authorTextWidth = doc.getStringUnitWidth(author) * 20; // Calculate width of author name
-  doc.text(20 + 180 - authorTextWidth, 250, `by ${author}`); // Position author name at bottom right
-  doc.addPage();
-}
+    if (frontCoverImage) {
+      await addBackgroundImage(frontCoverImage);
+      doc.setFontSize(40);
+      doc.text(title, 20, 150);
+      doc.setFontSize(20);
+      const authorTextWidth = doc.getStringUnitWidth(author) * 20;
+      doc.text(`by ${author}`, 20 + 180 - authorTextWidth, 250);
+      doc.addPage();
+    }
 
-// Content Pages
-pages.forEach((pageContent, index) => {
-  if (pageContent.text === '' && !pageContent.imageUrl) {
-    return; // Skip empty pages
-  }
+    // Content Pages
+    for (const pageContent of pages) {
+      if (pageContent.text === '' && !pageContent.imageUrl) {
+        continue;
+      }
 
-  if (pageContent.imageUrl) {
-    addBackgroundImage(pageContent.imageUrl);
-  }
+      if (pageContent.imageUrl) {
+        await addBackgroundImage(pageContent.imageUrl);
+      }
 
-  if (pageContent.text) {
-    doc.setFontSize(20);
-    doc.text(40, 40, pageContent.text);
-  }
+      if (pageContent.text) {
+        doc.setFontSize(20);
+        doc.text(pageContent.text, 40, 40);
+      }
 
-  doc.addPage(); // Move to next page
-});
-  
+      doc.addPage();
+    }
+
     // Back Cover
     if (backCoverImage) {
-      addBackgroundImage(backCoverImage);
+      await addBackgroundImage(backCoverImage);
     }
-  
+
     // Save PDF
     doc.save(`${title}.pdf`);
   };
-  
+
   return (
     <div className="App">
       <h1>BriBooks</h1>
-      
-      {/* Image Upload */}
-      <ImageUpload label="Front Cover Image  " onChange={setFrontCoverImage} />
-     
-      <ImageUpload label="Back Cover Image  " onChange={setBackCoverImage} />
-     
-      {/* Text Input */}
-      <TextInput label="Title  " value={title} onChange={setTitle} />
-      <TextInput label="Author  " value={author} onChange={setAuthor} />
+      <ImageUpload label="Front Cover Image" onChange={setFrontCoverImage} />
+      <ImageUpload label="Back Cover Image" onChange={setBackCoverImage} />
+      <TextInput label="Title" value={title} onChange={setTitle} />
+      <TextInput label="Author" value={author} onChange={setAuthor} />
 
       <div className="flex-container">
-        {/* Page Management */}
         <div className="half-width">
           <PageManagement pages={pages} setPages={setPages} />
         </div>
-
-        {/* Preview Mode */}
         <div className="half-width">
-        <PreviewMode 
-  frontCoverImage={frontCoverImage} 
-  backCoverImage={backCoverImage} 
-  title={title} 
-  author={author} 
-  pages={pages} 
-  onRemoveFrontCover={() => setFrontCoverImage(null)} 
-  onRemoveBackCover={() => setBackCoverImage(null)} 
-  onRemovePage={(index) => {
-    const newPages = [...pages];
-    newPages.splice(index, 1);
-    setPages(newPages);
-  }} 
-/>
- </div>
+          <PreviewMode
+            frontCoverImage={frontCoverImage}
+            backCoverImage={backCoverImage}
+            title={title}
+            author={author}
+            pages={pages}
+            onRemoveFrontCover={() => setFrontCoverImage(null)}
+            onRemoveBackCover={() => setBackCoverImage(null)}
+            onRemovePage={(index) => {
+              const newPages = [...pages];
+              newPages.splice(index, 1);
+              setPages(newPages);
+            }}
+          />
+        </div>
       </div>
-      
-      {/* PDF Generation */}
+
       <button className="generate-pdf-button" onClick={handleGeneratePdf}>Generate PDF</button>
-      
-      {/* Error Handling */}
       <ErrorHandling error={error} />
     </div>
   );

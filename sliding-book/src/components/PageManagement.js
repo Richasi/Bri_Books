@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
-import "./page.css"
+import "./page.css";
 
 const PageManagement = ({ pages, setPages }) => {
   const [imageFiles, setImageFiles] = useState(Array(pages.length).fill(null));
@@ -12,10 +10,10 @@ const PageManagement = ({ pages, setPages }) => {
   };
 
   const handleImageUpload = (index, file) => {
-    if (!file) return; // Do nothing if no file is selected
+    if (!file) return;
 
     const newImageFiles = [...imageFiles];
-    newImageFiles[index] = file.name; // Store only the name of the file
+    newImageFiles[index] = file.name;
     setImageFiles(newImageFiles);
 
     const reader = new FileReader();
@@ -44,8 +42,6 @@ const PageManagement = ({ pages, setPages }) => {
     setImageFiles(newImageFiles);
   };
 
- 
-
   return (
     <div id="page-management" className="page-management-container">
       <button className="add-page-button" onClick={handleAddPage}>Add Page</button>
@@ -54,7 +50,7 @@ const PageManagement = ({ pages, setPages }) => {
           <h3>Page {index + 1}</h3>
           <button className="remove-page-button" onClick={() => handleRemovePage(index)}>Remove</button>
           <input className="image-upload-input" type="file" accept="image/*" onChange={(e) => handleImageUpload(index, e.target.files[0])} />
-          {imageFiles[index] && <p>{imageFiles[index]}</p>} {/* Display the file name */}
+          {imageFiles[index] && <p>{imageFiles[index]}</p>}
           <input className="text-input" type="text" value={page.text || ''} onChange={(e) => handleTextChange(index, e.target.value)} placeholder="Main text..." />
         </div>
       ))}
