@@ -1,11 +1,7 @@
 import React from 'react';
 
 const ErrorHandling = ({ error }) => {
-  return (
-    <div>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-    </div>
-  );
+  return error ? <div className="error">{error}</div> : null;
 };
 
 export default ErrorHandling;

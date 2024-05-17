@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './App.css';
 import jsPDF from 'jspdf';
+import QRCode from 'qrcode';
 import ImageUpload from './components/ImageUpload';
 import TextInput from './components/TextInput';
 import PageManagement from './components/PageManagement';
@@ -22,6 +23,10 @@ function App() {
       img.onload = () => resolve(img);
       img.onerror = (err) => reject(err);
     });
+  };
+
+  const generateQRCode = (text) => {
+    return QRCode.toDataURL(text, { width: 150, margin: 1 });
   };
 
   const handleGeneratePdf = async () => {
@@ -77,7 +82,7 @@ function App() {
       }
 
       if (pageContent.text) {
-        doc.setFontSize(20);
+        doc.setFontSize(15);
         doc.text(pageContent.text, 40, 40);
       }
 
@@ -88,6 +93,12 @@ function App() {
     if (backCoverImage) {
       await addBackgroundImage(backCoverImage);
     }
+
+    // QR Code and Thank You message
+    const qrCodeUrl = await generateQRCode('https://example.com'); // Replace with your desired URL
+    doc.addImage(qrCodeUrl, 'JPEG', 20, 20, 50, 50);
+    doc.setFontSize(20);
+    doc.text('Thank you for reading!', 20, 80);
 
     // Save PDF
     doc.save(`${title}.pdf`);

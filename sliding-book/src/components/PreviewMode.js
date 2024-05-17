@@ -28,6 +28,7 @@ const PreviewMode = ({ frontCoverImage, backCoverImage, title, author, pages, on
         <div>
           <img className="preview-cover-image" src={backCoverImage} alt="Back Cover" />
           <button className="remove-button" onClick={onRemoveBackCover}>Remove Back Cover</button>
+          <p className="thank-you">Thank You for reading</p>
         </div>
       )}
     </div>
